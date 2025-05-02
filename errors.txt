@@ -1,0 +1,18 @@
+The original response had several issues detailed below alongside the edits made:
+- Duplicated amqp and eureka-client dependencies in the new modules which already existed in the parent pom.xml. I removed the duplicated dependencies.
+- Used deprecated @EnableEurekaClient instead of @EnableDiscoveryClient. This led to a compile-time error and I had to replace it with @EnableDiscoveryClient
+- Orders service used deprecated javax.persistence instead of jakarta.persistence. It also failed to include postgresql dependency. This led to compile-time errors due to missing dependencies.
+- Added unnecessary bootstraps to docker-compose by referencing the microservice modules and yet dockerfiles have not been defined for these modules. I removed these unnecessary modules from the docker-compose file leaving it the way it was since the file didn't need any change.
+- Didn't add PostgreSQL dialect to the .yml hibernate properties. This led to runtime errors since hibernate couldn't determine the dialect to use. I added the dialect to hibernate properties.
+- Used postgres as the host of the jdbc URL instead of using localhost which led to JDBC connection errors.
+- Used Order as the table name and yet ORDER is a reserved keyword which caused runtime errors while hibernate was initializing the database tables. I renamed the table name to 'orders' using @Table annotation.
+- Didn't add "com.example.rabbitmq" and "com.example.notification" for notification service or "com.example.orders" for orders service to scanBasePackages property of SpringBootApplication annotation. Hence, RabbitMQProducer could not be autowired.
+- The checkout method tries to delete cart items. This modification operation needs to be performed within a transaction context in spring. However, the model failed to annotate the function with @Transactional annotation hence leading to a runtime error.
+- Used rabbitmq as the host for rabbitmq instead of using localhost, hence, the services couldn't connect to rabbitmq. I changed this to use localhost.
+
+Other necessary updates made included:
+- Modified jwtUtil to use the latest jsonwebtoken library which came with several changes including using jwtParser instead of parserBuilder
+- Added getSignInKey method to return a more enhanced and secure key.
+- Added jwtAuthenticationWebFilter to the security config which was not added initially by the model. This was an instruction following issue on the part of the model, as the prompt requested that all the other requests except `auth` needed to be authenticated using a JWT token.
+
+The new version of the edited response is now an ideal response as it has addressed all the build, compile-time and runtime errors. It also uses the latest libraries of dependencies used including for spring security and JWT tokens. This reduces the vulnerability of the application to security threats. The response now fully addresses the prompt requirements.
